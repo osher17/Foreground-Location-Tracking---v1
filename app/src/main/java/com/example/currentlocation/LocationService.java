@@ -67,7 +67,7 @@ public class LocationService extends Service
                     location = locationResult.getLastLocation();
                     double  latitude = location.getLatitude();
                     double longitude = location.getLongitude();
-                    Log.d(TAG ,latitude + ", " + longitude + ", " + getUserAddress());
+                    Log.d(TAG ,latitude + ", " + longitude + ", " + getUserAddress(latitude, longitude));
                     try {
                         SockMngr.sendAndReceive(username + "," +location.getLatitude() + "," + location.getLongitude());
                         Log.d(TAG, SockMngr.response);
@@ -85,6 +85,28 @@ public class LocationService extends Service
                             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
                             notificationManager.notify(1111, builder.build());
+                        }
+                        else if(SockMngr.response.startsWith("HISTORY_CHECK_ALERT"))
+                        {
+                            Log.d(TAG, "*****HISTORY_CHECK_ALERT*****");
+                            String [] arr = SockMngr.response.split(",");
+                            double alert_lat = Double.parseDouble(arr[1]);
+                            double alert_long = Double.parseDouble(arr[2]);
+                            String time = arr[3];
+                            String date = arr[4];
+                            String place = getUserAddress(alert_lat, alert_long);
+                            String msg = "You have been exposed to a Covid-19 carrier on " + date + " at " + time + " on " + place;
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                                    .setSmallIcon(R.drawable.ic_baseline_error_24)
+                                    .setContentTitle("You have been exposed to a carrier a few days ago")
+                                    .setContentText(msg)
+                                    .setStyle(new NotificationCompat.BigTextStyle())
+                                    .setAutoCancel(true)
+                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                            notificationManager.notify(1121, builder.build());
+
                         }
                     } catch (Exception e) {
                         Log.d(TAG, "*****exception****");
@@ -188,13 +210,13 @@ public class LocationService extends Service
 
 
 
-    private String getUserAddress()
+    private String getUserAddress(double latitude, double longitude)
     {
         // get address from location and show it
         Geocoder geocoder = new Geocoder(LocationService.this);
         try
         {
-            List<Address> addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), Constants.MAX_RESULTS);
+            List<Address> addressList = geocoder.getFromLocation(latitude, longitude, Constants.MAX_RESULTS);
             return (addressList.get(0).getAddressLine(0));
 
         }
