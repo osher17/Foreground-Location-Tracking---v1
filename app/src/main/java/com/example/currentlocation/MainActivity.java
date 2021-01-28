@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity
     private Dialog dialog;
     private EditText dialogEt;
     private String username;
-    private Button doneBtn;
+    private Button doneBtn, sickbtn, notifyBtn;
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
 
@@ -46,6 +46,21 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // get username if exists
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mEditor = mPreferences.edit();
+        if(mPreferences.getString("username", "").equals(""))
+        {
+            createAndHandleDialog();
+        }
+
+        sickbtn = findViewById(R.id.sickbtn);
+        sickbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createAndHandleSickDialog();
+            }
+        });
         // create toggle button
         toggle = (ToggleButton) findViewById(R.id.toggleButton);
         // present the toggle button as on if the app has been opened again and the service is still running
@@ -87,18 +102,49 @@ public class MainActivity extends AppCompatActivity
                     // the button has been switched off - stop location service
                     stopLocationService();
                     // disconnect from server
-                    SockMngr.sendAndReceive("QUIT");
+                    Log.d("**********", username);
+                    SockMngr.sendAndReceive(username + "," + "QUIT");
                 }
             }
         });
 
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mEditor = mPreferences.edit();
+    }
 
-        if(mPreferences.getString("username", "").equals(""))
+    private void createAndHandleSickDialog()
+    {
+        // create dialog
+        dialog = new Dialog(MainActivity.this);
+        dialog.setContentView(R.layout.sick_dialog);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
-            createAndHandleDialog();
+            dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.background));
         }
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(true);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.animation;
+        dialog.show();
+
+        // initiate done button
+        notifyBtn = dialog.findViewById(R.id.notifyBtn);
+        notifyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                try {
+                    // initiate socket
+                    SockMngr.initiate();
+                    // declare
+                    String username = mPreferences.getString("username", "");
+                    SockMngr.sendAndReceive(username + "," +"SICK");
+                    // disconnect from server
+                    SockMngr.sendAndReceive(username + "," + "QUIT");
+                    dialog.dismiss();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 
@@ -233,7 +279,7 @@ public class MainActivity extends AppCompatActivity
                 b = true;
             }
             // disconnect from server
-            SockMngr.sendAndReceive("QUIT");
+            SockMngr.sendAndReceive(username + "," + "QUIT");
             return b;
         }
         catch (Exception e) {

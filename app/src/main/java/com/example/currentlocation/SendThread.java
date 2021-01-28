@@ -27,7 +27,7 @@ class SendThread implements Runnable {
             out.print(msg_len + SockMngr.text2send);
             out.flush(); // flushing to force write
 
-            if (!SockMngr.text2send.equals("QUIT"))
+            if (!SockMngr.text2send.contains("QUIT"))
             {
                 // receiving response
                 char[] buff = new char[100000];
@@ -39,6 +39,12 @@ class SendThread implements Runnable {
                 Log.i("SendThread", "run: result " + rsp);
                 SockMngr.response = rsp;
             }
+            else
+            {
+                // close socket
+                SockMngr.socket.close();
+            }
+            
 
         } catch (UnknownHostException e) {
             e.printStackTrace();

@@ -36,8 +36,8 @@ public class LocationService extends Service
     private static final String CHANNEL_NAME = "Location Service"; // The user visible name of the notification channel
     private static final String CHANNEL_DESCRIPTION = "This channel is used by location service"; // notification channel description
     private static final int REQUEST_CODE = 0; // private request code for the sender of the pending intent
-    public static final int DEFAULT_INTERVAL = 4000; // default location update interval
-    public static final int FASTEST_INTERVAL = 2000; // fastest location update interval
+    public static final int DEFAULT_INTERVAL = 7000; // default location update interval
+    public static final int FASTEST_INTERVAL = 4000; // fastest location update interval
     private LocationCallback locationCallBack ; //Used for receiving notifications from the FusedLocationProviderApi
                                                 // when the device location has changed or can no longer be determined
     private Location location; // last known location or updated location
@@ -69,7 +69,7 @@ public class LocationService extends Service
                     double longitude = location.getLongitude();
                     Log.d(TAG ,latitude + ", " + longitude + ", " + getUserAddress());
                     try {
-                        SockMngr.sendAndReceive(location.getLatitude() + "," + location.getLongitude() + "," + username);
+                        SockMngr.sendAndReceive(username + "," +location.getLatitude() + "," + location.getLongitude());
                         Log.d(TAG, SockMngr.response);
                         // if an alert is received
                         if(SockMngr.response.equals("CODE RED"))
