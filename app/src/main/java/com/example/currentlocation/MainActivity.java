@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity
         {
             createAndHandleDialog();
         }
+        this.username = mPreferences.getString("username", "");
+
 
         sickbtn = findViewById(R.id.sickbtn);
         sickbtn.setOnClickListener(new View.OnClickListener() {
@@ -80,8 +82,20 @@ public class MainActivity extends AppCompatActivity
                    // if the app didn't get the required permissions
                     if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                     {
-                        // request fine location permission
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
+                        do {
+                            // request fine location permission
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
+                        }
+                       while (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED);
+                        try {
+                            // initiate socket
+                            SockMngr.initiate();
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        // the app has permission - start location service
+                        startLocationService();
                     }
                     else
                     {
@@ -102,8 +116,9 @@ public class MainActivity extends AppCompatActivity
                     // the button has been switched off - stop location service
                     stopLocationService();
                     // disconnect from server
-                    Log.d("**********", username);
+                    Log.d("******", "Sending quit!!");
                     SockMngr.sendAndReceive(username + "," + "QUIT");
+                    Log.d("******", "Sent quit!!");
                 }
             }
         });
@@ -131,13 +146,18 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 try {
-                    // initiate socket
-                    SockMngr.initiate();
+                    if(!isLocationServiceRunning())
+                    {
+                        // initiate socket
+                        SockMngr.initiate();
+                    }
                     // declare
-                    String username = mPreferences.getString("username", "");
                     SockMngr.sendAndReceive(username + "," +"SICK");
-                    // disconnect from server
-                    SockMngr.sendAndReceive(username + "," + "QUIT");
+                    if(!isLocationServiceRunning())
+                    {
+                        // disconnect from server
+                        SockMngr.sendAndReceive(username + "," + "QUIT");
+                    }
                     dialog.dismiss();
                 }
                 catch (Exception e) {
@@ -263,6 +283,15 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+        this.username = mPreferences.getString("username", "");
+        if(this.username!=null)
+        {
+            Log.d("username is", this.username);
+        }
+        else
+        {
+            Log.d("username is ", "null :) ");
+        }
     }
 
     private boolean isUsernameFree(String username)
