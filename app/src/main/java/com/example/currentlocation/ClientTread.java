@@ -8,7 +8,7 @@ class ClientThread implements Runnable {
     // a thread initiating socket
 
     private static final int SERVERPORT = 1234;
-    private static final String SERVER_IP = "172.29.225.44";
+    private static final String SERVER_IP = "10.100.102.10";
 
     public void run() {
 
