@@ -10,10 +10,13 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
 
-class SendThread implements Runnable {
-     private static final int BUFFER_SIZE = 100000;
-    // a thread sending amd receiving
+class SendThread implements Runnable
+{
+    // a thread sending and receiving
 
+     private static final int BUFFER_SIZE = 100000; // buffer size
+
+    // send and receive messages
     @Override
     public void run() {
         // a thread writing to socket
@@ -27,6 +30,7 @@ class SendThread implements Runnable {
             out.print(msg_len + SockMngr.text2send);
             out.flush(); // flushing to force write
 
+            // if the user hasn't asked to quit
             if (!SockMngr.text2send.contains("QUIT"))
             {
                 // receiving response

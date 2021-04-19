@@ -34,13 +34,14 @@ public class MainActivity extends AppCompatActivity
 
     private final static int PERMISSION_FINE_LOCATION = 1; //permission request number, identifies the permission
     private ToggleButton toggle; // used to switch the service on and off
-    private Dialog dialog;
-    private EditText dialogEt;
-    private String username;
-    private Button doneBtn, sickbtn, notifyBtn;
-    private SharedPreferences mPreferences;
-    private SharedPreferences.Editor mEditor;
+    private Dialog dialog; // dialog manager
+    private EditText dialogEt; // EditText manager
+    private String username; // client's username - identifies the device
+    private Button doneBtn, sickbtn, notifyBtn; // Buttons managers
+    private SharedPreferences mPreferences; // Interface for accessing and modifying preference data
+    private SharedPreferences.Editor mEditor; //All change made in an editor are batched, and not copied back to the original SharedPreferences until commit/ apply
 
+    // sets the initial state when the app is opened
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -125,6 +126,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    // creates and handles the dialog box for declaring sickness
     private void createAndHandleSickDialog()
     {
         // create dialog
@@ -245,6 +247,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // creates and handles a dialog window for signing up
     private void createAndHandleDialog()
     {
         // create dialog
@@ -294,6 +297,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // addresses the server and returns is the chosen username free
     private boolean isUsernameFree(String username)
     {
         // connect to server

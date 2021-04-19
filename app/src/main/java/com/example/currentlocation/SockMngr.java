@@ -5,23 +5,23 @@ import java.net.Socket;
 
 public class SockMngr {
 
+    public static  Socket socket; // Client's socket
+    public static String text2send; // message that should be sent to the server
+    public static final int TIMEOUT = 1000; // time to wait
+    public static String response; // server response
+    private final static Object syncObj = new Object(); // object for synchronizing threads
+    private static boolean waitDone = false; // has the thread ended?
 
 
-    public static  Socket socket;
-    public static String text2send;
-    public static final int TIMEOUT = 1000;
-    public static String response;
-    private final static Object syncObj = new Object();
-    private static boolean waitDone = false;
-
-    public static  void initiate()
+    // initiate thread for initiating socket
+    public static void initiate()
     {
-
         ClientThread clntThrd = new ClientThread();
         new Thread(clntThrd).start();
         waitForSock();
     }
 
+    // send and receive messages
     public static void sendAndReceive(String msg)
     {
         // socket cant be used on main thread
@@ -32,6 +32,7 @@ public class SockMngr {
 
     }
 
+    // wait until the thread has ended
     private static void waitForSock()
     {
         try {
@@ -47,9 +48,9 @@ public class SockMngr {
         }
     }
 
+    // notify the thread has ended
     public static synchronized void notifyDone()
     {
-
         synchronized(syncObj) {
             waitDone = true;
             syncObj.notify();

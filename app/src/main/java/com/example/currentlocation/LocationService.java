@@ -31,7 +31,7 @@ import java.util.List;
 
 public class LocationService extends Service
 {
-    private String TAG = LocationService.class.getSimpleName();
+    private String TAG = LocationService.class.getSimpleName(); // the simple name of the class (for logs)
     private static final String CHANNEL_ID = "location_notification_channel"; // notification channel id
     private static final String CHANNEL_NAME = "Location Service"; // The user visible name of the notification channel
     private static final String CHANNEL_DESCRIPTION = "This channel is used by location service"; // notification channel description
@@ -41,9 +41,8 @@ public class LocationService extends Service
     private LocationCallback locationCallBack ; //Used for receiving notifications from the FusedLocationProviderApi
                                                 // when the device location has changed or can no longer be determined
     private Location location; // last known location or updated location
-    private LocationRequest locationRequest; //
-    private SharedPreferences mPreferences;
-    private SharedPreferences.Editor mEditor;
+    private LocationRequest locationRequest; // contains parameters for the location request
+    private SharedPreferences mPreferences; // Interface for accessing and modifying preference data
 
     // triggered when starting the service (every single time)
 
@@ -118,11 +117,12 @@ public class LocationService extends Service
         };
     }
 
+    // Called by the system every time a client explicitly starts the service
+    // starts the service and returns the value that indicates
+    // what semantics the system should use for the service's current started state
     @Override
     public int onStartCommand(Intent intent, int flag, int startId)
     {
-
-
         // start location service
         startLocationService();
         //  return the value that indicates what semantics the system should use for the service's current started state
@@ -137,6 +137,7 @@ public class LocationService extends Service
         stopLocationService();
     }
 
+    // stops the service (called by the system)
     @Override
     public boolean stopService(Intent name) {
         Log.d(TAG,"STOP SERVICE");
@@ -144,6 +145,7 @@ public class LocationService extends Service
         return super.stopService(name);
     }
 
+    // called if the service is currently running and the user has removed a task that comes from the service's application.
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         Log.d(TAG,"ON TASK REMOVED");
@@ -196,7 +198,7 @@ public class LocationService extends Service
 
     }
 
-
+    // stop the service
     private void stopLocationService()
     {
         Log.d("location", "*****STOPPED****");
@@ -209,7 +211,7 @@ public class LocationService extends Service
 
 
 
-
+    // get the user's address (street, town, etc..)
     private String getUserAddress(double latitude, double longitude)
     {
         // get address from location and show it
@@ -253,10 +255,10 @@ public class LocationService extends Service
         return null;
     }
 
+    // get username from shared prefrences
     public String get_username()
     {
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mEditor = mPreferences.edit();
         String username = mPreferences.getString("username", "");
         return username;
     }
