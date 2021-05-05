@@ -97,7 +97,7 @@ public class LocationService extends Service
                             String msg = "You have been exposed to a Covid-19 carrier on " + date + " at " + time + " on " + place;
                             NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                     .setSmallIcon(R.drawable.ic_baseline_error_24)
-                                    .setContentTitle("You have been exposed to a carrier a few days ago")
+                                    .setContentTitle("You have been exposed to a carrier")
                                     .setContentText(msg)
                                     .setStyle(new NotificationCompat.BigTextStyle())
                                     .setAutoCancel(true)
