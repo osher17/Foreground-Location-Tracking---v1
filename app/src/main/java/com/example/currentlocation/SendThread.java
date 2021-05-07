@@ -1,6 +1,8 @@
 package com.example.currentlocation;
 
+import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
+import java.security.acl.LastOwnerException;
 
 class SendThread implements Runnable
 {
@@ -27,9 +30,9 @@ class SendThread implements Runnable
                     new OutputStreamWriter(SockMngr.socket.getOutputStream())),
                     true);
             String msg_len = String.format("%04d", SockMngr.text2send.toString().length());
+            Log.d("MESSAGE: ", SockMngr.text2send);
             out.print(msg_len + SockMngr.text2send);
             out.flush(); // flushing to force write
-
             // if the user hasn't asked to quit
             if (!SockMngr.text2send.contains("QUIT"))
             {
@@ -45,6 +48,7 @@ class SendThread implements Runnable
             }
             else
             {
+                Log.d("QUIT", "Sent quit, closing socket");
                 // close socket
                 SockMngr.socket.close();
             }
@@ -52,11 +56,14 @@ class SendThread implements Runnable
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
+            Log.d("Exception", "UnknownHostException");
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("Exception", "IOException");
         } catch (Exception e) {
             Log.e("SendThread", "onClick: ", e);
             e.printStackTrace();
+            Log.d("Exception", "Exception");
         }
         SockMngr.notifyDone();
     }

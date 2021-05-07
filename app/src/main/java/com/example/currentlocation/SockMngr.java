@@ -1,5 +1,7 @@
 package com.example.currentlocation;
 
+import android.content.Intent;
+
 import java.net.Socket;
 
 
@@ -38,7 +40,7 @@ public class SockMngr {
         try {
             synchronized (syncObj) {
                 waitDone = false;
-                //Wait the current Thread for 15 seconds
+                //Wait the current Thread for 1 second
                 while (!waitDone)
                     syncObj.wait(TIMEOUT);
             }

@@ -262,4 +262,5 @@ public class LocationService extends Service
         String username = mPreferences.getString("username", "");
         return username;
     }
+
 }
