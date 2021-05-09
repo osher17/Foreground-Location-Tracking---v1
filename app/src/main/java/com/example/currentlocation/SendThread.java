@@ -49,6 +49,10 @@ class SendThread implements Runnable
                 // close socket
                 SockMngr.socket.close();
             }
+            if(SockMngr.response.equals(""))
+            {
+                SockMngr.response = "CRASH";
+            }
 
 
         } catch (UnknownHostException e) {
