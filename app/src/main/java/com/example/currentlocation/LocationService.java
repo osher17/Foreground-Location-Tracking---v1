@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -27,6 +28,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.IOException;
 import java.util.List;
 
 public class LocationService extends Service
@@ -107,10 +109,17 @@ public class LocationService extends Service
                             notificationManager.notify(1121, builder.build());
 
                         }
-                    } catch (Exception e) {
+                        else if(SockMngr.response.equals("CRASH"))
+                        {
+                            stopLocationService();
+                            Log.d("ERROR", "SERVICE CRASHED");
+                        }
+                    }
+                    catch (Exception e) {
                         Log.d(TAG, "*****exception****");
                         e.printStackTrace();
                     }
+
                 }
                 Log.d(TAG, "*****finished function");
             }

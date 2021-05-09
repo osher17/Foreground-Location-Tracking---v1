@@ -16,15 +16,12 @@ import java.security.acl.LastOwnerException;
 class SendThread implements Runnable
 {
     // a thread sending and receiving
-
      private static final int BUFFER_SIZE = 100000; // buffer size
-
     // send and receive messages
     @Override
     public void run() {
         // a thread writing to socket
         try {
-
             // actual writing to socket
             PrintWriter out = new PrintWriter(new BufferedWriter(
                     new OutputStreamWriter(SockMngr.socket.getOutputStream())),
@@ -52,7 +49,7 @@ class SendThread implements Runnable
                 // close socket
                 SockMngr.socket.close();
             }
-            
+
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -60,6 +57,7 @@ class SendThread implements Runnable
         } catch (IOException e) {
             e.printStackTrace();
             Log.d("Exception", "IOException");
+            SockMngr.response = "CRASH";
         } catch (Exception e) {
             Log.e("SendThread", "onClick: ", e);
             e.printStackTrace();
