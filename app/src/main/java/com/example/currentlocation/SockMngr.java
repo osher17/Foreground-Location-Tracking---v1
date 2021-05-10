@@ -1,6 +1,7 @@
 package com.example.currentlocation;
 
 import android.content.Intent;
+import android.util.Log;
 
 import java.net.Socket;
 
@@ -21,6 +22,7 @@ public class SockMngr {
         ClientThread clntThrd = new ClientThread();
         new Thread(clntThrd).start();
         waitForSock();
+        Log.d("initiate", "finished waiting");
     }
 
     // send and receive messages

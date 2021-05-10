@@ -1,4 +1,6 @@
 package com.example.currentlocation;
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -8,7 +10,7 @@ class ClientThread implements Runnable {
     // a thread initiating socket
 
     private static final int SERVERPORT = 1234; // server port
-    private static final String SERVER_IP = "192.168.43.26"; // server ip
+    private static final String SERVER_IP = "172.29.234.87"; // server ip
 
     // initiate socket
     public void run()
@@ -19,11 +21,15 @@ class ClientThread implements Runnable {
 
         } catch (UnknownHostException e1) {
             e1.printStackTrace();
+            Log.d("Exception", "UnknownHostException");
         } catch (IOException e1) {
             e1.printStackTrace();
+            SockMngr.response = "FAILURE";
+            Log.d("Exception", "IO EXCEPTION");
         }
         // notify thread ended
         SockMngr.notifyDone();
+        Log.d("ClientThread", "Notify");
 
     }
 

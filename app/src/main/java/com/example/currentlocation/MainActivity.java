@@ -59,9 +59,8 @@ public class MainActivity extends AppCompatActivity
         }
         this.username = mPreferences.getString("username", "");
 
-        // Declare timer
         this.countDownTimer = null;
-        startTimer();
+
 
         sickbtn = findViewById(R.id.sickbtn);
         sickbtn.setOnClickListener(new View.OnClickListener() {
@@ -116,6 +115,7 @@ public class MainActivity extends AppCompatActivity
                         // the app has permission - start location service
                         startLocationService();
                     }
+                    startTimer();
                 }
                 else
                 {
@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity
                     Log.d("******", "Sending quit!!");
                     SockMngr.sendAndReceive(username + "," + "QUIT");
                     Log.d("******", "Sent quit!!");
+                    cancelTimer();
                 }
             }
         });
@@ -153,19 +154,26 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 try {
-                    if(!isLocationServiceRunning())
-                    {
+                    if (!isLocationServiceRunning()) {
                         // initiate socket
                         SockMngr.initiate();
                     }
-                    // declare
-                    SockMngr.sendAndReceive(username + "," +"SICK");
-                    if(!isLocationServiceRunning())
+                    Log.d("Main activity", "after initiate");
+                    if (SockMngr.response.equals("FAILURE"))
                     {
-                        // disconnect from server
-                        SockMngr.sendAndReceive(username + "," + "QUIT");
+                        dialog.dismiss();
+                        Toast.makeText(MainActivity.this, "Couldn't connect to the server", Toast.LENGTH_LONG).show();
                     }
-                    dialog.dismiss();
+                    else
+                        {
+                        // declare
+                        SockMngr.sendAndReceive(username + "," + "SICK");
+                        if (!isLocationServiceRunning()) {
+                            // disconnect from server
+                            SockMngr.sendAndReceive(username + "," + "QUIT");
+                        }
+                        dialog.dismiss();
+                    }
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -342,6 +350,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     Log.d("MAIN ACTIVITY", "SERVICE ISN'T RUNNING");
                     toggle.setChecked(false);
+                    Toast.makeText(MainActivity.this, "The server has crashed", Toast.LENGTH_SHORT).show();
                     this.cancel();
                 }
             }
@@ -357,6 +366,10 @@ public class MainActivity extends AppCompatActivity
     //cancel timer
     public void cancelTimer() {
         if(this.countDownTimer!=null)
+        {
             this.countDownTimer.cancel();
+            onStart = true;
+        }
+
     }
 }
