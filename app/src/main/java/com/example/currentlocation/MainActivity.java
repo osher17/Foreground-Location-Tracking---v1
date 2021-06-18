@@ -352,6 +352,7 @@ public class MainActivity extends AppCompatActivity
                     toggle.setChecked(false);
                     Toast.makeText(MainActivity.this, "The server has crashed", Toast.LENGTH_SHORT).show();
                     this.cancel();
+                    Log.d("MAIN ACTIVITY", "im here");
                 }
             }
             public void onFinish()
