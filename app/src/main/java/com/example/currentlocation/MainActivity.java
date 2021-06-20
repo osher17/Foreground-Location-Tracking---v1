@@ -100,6 +100,11 @@ public class MainActivity extends AppCompatActivity
                         catch (Exception e) {
                             e.printStackTrace();
                         }
+                        // send username and status - sync
+                        String status = mPreferences.getString("status", "");
+                        // should it be in try catch? **
+                        SockMngr.sendAndReceive(username + "," + status);
+                        Log.d("MAIN ACTIVITY", "SYNCED");
                         // the app has permission - start location service
                         startLocationService();
                     }
@@ -112,6 +117,11 @@ public class MainActivity extends AppCompatActivity
                         catch (Exception e) {
                             e.printStackTrace();
                         }
+                        // send username and status - sync
+                        String status = mPreferences.getString("status", "");
+                        // should it be in try catch? **
+                        SockMngr.sendAndReceive(username + "," + status);
+                        Log.d("MAIN ACTIVITY", "SYNCED");
                         // the app has permission - start location service
                         startLocationService();
                     }
@@ -173,6 +183,8 @@ public class MainActivity extends AppCompatActivity
                             SockMngr.sendAndReceive(username + "," + "QUIT");
                         }
                         dialog.dismiss();
+                        mEditor.putString("status", "sick");
+                        mEditor.commit();
                     }
                 }
                 catch (Exception e) {
@@ -290,6 +302,7 @@ public class MainActivity extends AppCompatActivity
                 if(isUsernameFree(username))
                 {
                     mEditor.putString("username", username);
+                    mEditor.putString("status", "healthy");
                     mEditor.commit();
                     dialog.dismiss();
                 }
