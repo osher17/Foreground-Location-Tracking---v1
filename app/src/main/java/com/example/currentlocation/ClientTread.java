@@ -18,6 +18,7 @@ class ClientThread implements Runnable {
         try {
             InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
             SockMngr.socket = new Socket(serverAddr, SERVERPORT); // connect
+            SockMngr.response = "ACCEPTED";
 
         } catch (UnknownHostException e1) {
             e1.printStackTrace();

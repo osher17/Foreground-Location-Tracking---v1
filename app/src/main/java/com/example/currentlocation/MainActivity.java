@@ -41,7 +41,8 @@ public class MainActivity extends AppCompatActivity
     private Button doneBtn, sickbtn, notifyBtn; // Buttons managers
     private SharedPreferences mPreferences; // Interface for accessing and modifying preference data
     private SharedPreferences.Editor mEditor; //All change made in an editor are batched, and not copied back to the original SharedPreferences until commit/ apply
-    private CountDownTimer countDownTimer ; // -add-
+    private CountDownTimer countDownTimer ; // timer that checks is the service running and determines in the server up
+    public boolean serviceControl = false ; // determines has the service been shut down by the user
     public boolean onStart = true;
 
     // sets the initial state when the app is opened
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         else
                             {
+                                serviceControl = false;
                             // send username and status - sync
                             String status = mPreferences.getString("status", "");
                             // should it be in try catch? **
@@ -123,6 +125,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
+                    serviceControl = true;
                     cancelTimer();
                     Log.d("Location Update", "Button clicked");
                     // the button has been switched off - stop location service
@@ -215,6 +218,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
+                    serviceControl = false;
                     Log.d("***", "after do initiate, going to start");
                     // send username and status - sync
                     String status = mPreferences.getString("status", "");
@@ -316,18 +320,6 @@ public class MainActivity extends AppCompatActivity
                 dialogEt = dialog.findViewById(R.id.dialogEt);
                 username = dialogEt.getText().toString();
                 handle_username(username, errorTv);
-                /*if(isUsernameFree(username))
-                {
-                    mEditor.putString("username", username);
-                    mEditor.putString("status", "healthy");
-                    mEditor.commit();
-                    dialog.dismiss();
-                }
-                else
-                {
-                    // otherwise present an error
-                    errorTv.setVisibility(View.VISIBLE);
-                }*/
 
             }
         });
@@ -342,31 +334,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // addresses the server and returns is the chosen username free
-    private boolean isUsernameFree(String username)
-    {
-        // connect to server
-        try {
-            // initiate socket
-            SockMngr.initiate();
-            // send username
-            SockMngr.sendAndReceive(username);
-            boolean b = false;
-            if(SockMngr.response.equals("FREE"))
-            {
-                b = true;
-            }
-            // disconnect from server
-            SockMngr.sendAndReceive(username + "," + "QUIT");
-            return b;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
-    // addresses the server and returns is the chosen username free
+    // addresses the server, if the username is free sets it, if not shows an appropriate message
     private void handle_username(String username, TextView errorTv)
     {
         // connect to server
@@ -424,7 +392,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     onStart = false;
                 }
-                else if(!onStart)
+                else if(!onStart && !serviceControl)
                 {
                     Log.d("MAIN ACTIVITY", "SERVICE ISN'T RUNNING");
                     toggle.setChecked(false);
