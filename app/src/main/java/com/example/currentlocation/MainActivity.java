@@ -93,20 +93,31 @@ public class MainActivity extends AppCompatActivity
                             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
                         }
                        while (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED);
-                        try {
+                        Log.d("***", "after do while, going to initiate");
+                       try {
                             // initiate socket
                             SockMngr.initiate();
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             e.printStackTrace();
                         }
-                        // send username and status - sync
-                        String status = mPreferences.getString("status", "");
-                        // should it be in try catch? **
-                        SockMngr.sendAndReceive(username + "," + status);
-                        Log.d("MAIN ACTIVITY", "SYNCED");
-                        // the app has permission - start location service
-                        startLocationService();
+                        if (SockMngr.response.equals("FAILURE"))
+                        {
+                            Toast.makeText(MainActivity.this, "Couldn't connect to the server", Toast.LENGTH_LONG).show();
+                            toggle.setChecked(false);
+                        }
+                        else
+                            {
+                                Log.d("***", "after do initiate, going to start");
+                                // send username and status - sync
+                            String status = mPreferences.getString("status", "");
+                            // should it be in try catch? **
+                            SockMngr.sendAndReceive(username + "," + status);
+                            Log.d("MAIN ACTIVITY", "SYNCED");
+                            // the app has permission - start location service
+                            startLocationService();
+                        }
                     }
                     else
                     {
@@ -117,13 +128,21 @@ public class MainActivity extends AppCompatActivity
                         catch (Exception e) {
                             e.printStackTrace();
                         }
-                        // send username and status - sync
-                        String status = mPreferences.getString("status", "");
-                        // should it be in try catch? **
-                        SockMngr.sendAndReceive(username + "," + status);
-                        Log.d("MAIN ACTIVITY", "SYNCED");
-                        // the app has permission - start location service
-                        startLocationService();
+                        if (SockMngr.response.equals("FAILURE"))
+                        {
+                            Toast.makeText(MainActivity.this, "Couldn't connect to the server", Toast.LENGTH_LONG).show();
+                            toggle.setChecked(false);
+                        }
+                        else
+                            {
+                            // send username and status - sync
+                            String status = mPreferences.getString("status", "");
+                            // should it be in try catch? **
+                            SockMngr.sendAndReceive(username + "," + status);
+                            Log.d("MAIN ACTIVITY", "SYNCED");
+                            // the app has permission - start location service
+                            startLocationService();
+                        }
                     }
                     startTimer();
                 }
@@ -202,17 +221,17 @@ public class MainActivity extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode,permissions,grantResults);
         // if permission is granted
         if(requestCode == PERMISSION_FINE_LOCATION && grantResults.length>EMPTY)
-
         {
             if(grantResults[PERMISSION_PLACE] == PackageManager.PERMISSION_GRANTED)
             {
+                Log.d("***", "onRequestPermissionsResult, started service");
                 // start location service
-                startLocationService();
+                //startLocationService();
             }
             else
             {
                 // didn't get permission, notify user
-                Toast.makeText(this, "You must enable these permissions inorder to to use this app", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "You must enable these permissions in order to to use this app", Toast.LENGTH_SHORT);
             }
         }
     }
@@ -299,6 +318,7 @@ public class MainActivity extends AppCompatActivity
                 // ** add wait **
                 dialogEt = dialog.findViewById(R.id.dialogEt);
                 username = dialogEt.getText().toString();
+                //handle_username(username, errorTv);
                 if(isUsernameFree(username))
                 {
                     mEditor.putString("username", username);
@@ -311,6 +331,7 @@ public class MainActivity extends AppCompatActivity
                     // otherwise present an error
                     errorTv.setVisibility(View.VISIBLE);
                 }
+
             }
         });
         this.username = mPreferences.getString("username", "");
@@ -348,6 +369,53 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    // addresses the server and returns is the chosen username free
+    private void handle_username(String username, TextView errorTv)
+    {
+        // connect to server
+        try {
+            // initiate socket
+            SockMngr.initiate();
+            if(SockMngr.response.equals("FAILURE"))
+            {
+                Log.d("Main Activity", "Username failure");
+                Toast.makeText(this, "Couldn't connect to the server", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // send username
+            SockMngr.sendAndReceive(username);
+            if(SockMngr.response.equals("CRASH"))
+            {
+                Log.d("Main Activity", "Username failure");
+                Toast.makeText(this, "Couldn't connect to the server", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(SockMngr.response.equals("FREE"))
+            {
+                mEditor.putString("username", username);
+                mEditor.putString("status", "healthy");
+                mEditor.commit();
+                dialog.dismiss();
+            }
+            else if (SockMngr.response.equals("OCCUPIED"))
+            {
+                // otherwise present an error
+                errorTv.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                Log.d("Main activity", "Unexpected error");
+                Toast.makeText(this, "Please try again later", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // disconnect from server
+            SockMngr.sendAndReceive(username + "," + "QUIT");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //start timer function
     public void startTimer()
     {
@@ -363,7 +431,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     Log.d("MAIN ACTIVITY", "SERVICE ISN'T RUNNING");
                     toggle.setChecked(false);
-                    Toast.makeText(MainActivity.this, "The server has crashed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Connection failure, please try again later", Toast.LENGTH_SHORT).show();
                     this.cancel();
                     Log.d("MAIN ACTIVITY", "im here");
                 }
