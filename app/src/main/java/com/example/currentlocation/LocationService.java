@@ -112,7 +112,7 @@ public class LocationService extends Service
                         else if(SockMngr.response.equals("CRASH"))
                         {
                             stopLocationService();
-                            Log.d("ERROR", "SERVICE CRASHED");
+                            Log.d("ERROR", "SERVER CRASHED");
                         }
                     }
                     catch (Exception e) {

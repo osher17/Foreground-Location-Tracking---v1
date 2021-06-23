@@ -85,42 +85,17 @@ public class MainActivity extends AppCompatActivity
                 // when clicked - start or stop the service according to the users choice
                 if (isChecked)
                 {
+                    toggle.setChecked(false);
                    // if the app didn't get the required permissions
                     if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                     {
-                        do {
                             // request fine location permission
                             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_FINE_LOCATION);
-                        }
-                       while (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED);
-                        Log.d("***", "after do while, going to initiate");
-                       try {
-                            // initiate socket
-                            SockMngr.initiate();
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        if (SockMngr.response.equals("FAILURE"))
-                        {
-                            Toast.makeText(MainActivity.this, "Couldn't connect to the server", Toast.LENGTH_LONG).show();
-                            toggle.setChecked(false);
-                        }
-                        else
-                            {
-                                Log.d("***", "after do initiate, going to start");
-                                // send username and status - sync
-                            String status = mPreferences.getString("status", "");
-                            // should it be in try catch? **
-                            SockMngr.sendAndReceive(username + "," + status);
-                            Log.d("MAIN ACTIVITY", "SYNCED");
-                            // the app has permission - start location service
-                            startLocationService();
-                        }
+
                     }
                     else
                     {
+                        toggle.setChecked(true);
                         try {
                             // initiate socket
                             SockMngr.initiate();
@@ -224,14 +199,36 @@ public class MainActivity extends AppCompatActivity
         {
             if(grantResults[PERMISSION_PLACE] == PackageManager.PERMISSION_GRANTED)
             {
-                Log.d("***", "onRequestPermissionsResult, started service");
-                // start location service
-                //startLocationService();
+                toggle.setChecked(true);
+                try {
+                    // initiate socket
+                    SockMngr.initiate();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                if (SockMngr.response.equals("FAILURE"))
+                {
+                    Toast.makeText(MainActivity.this, "Couldn't connect to the server", Toast.LENGTH_LONG).show();
+                    toggle.setChecked(false);
+                }
+                else
+                {
+                    Log.d("***", "after do initiate, going to start");
+                    // send username and status - sync
+                    String status = mPreferences.getString("status", "");
+                    // should it be in try catch? **
+                    SockMngr.sendAndReceive(username + "," + status);
+                    Log.d("MAIN ACTIVITY", "SYNCED");
+                    // the app has permission - start location service
+                    startLocationService();
+                }
             }
             else
             {
                 // didn't get permission, notify user
-                Toast.makeText(this, "You must enable these permissions in order to to use this app", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "You must enable these permissions in order to to use this app", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -318,8 +315,8 @@ public class MainActivity extends AppCompatActivity
                 // ** add wait **
                 dialogEt = dialog.findViewById(R.id.dialogEt);
                 username = dialogEt.getText().toString();
-                //handle_username(username, errorTv);
-                if(isUsernameFree(username))
+                handle_username(username, errorTv);
+                /*if(isUsernameFree(username))
                 {
                     mEditor.putString("username", username);
                     mEditor.putString("status", "healthy");
@@ -330,7 +327,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     // otherwise present an error
                     errorTv.setVisibility(View.VISIBLE);
-                }
+                }*/
 
             }
         });
