@@ -25,10 +25,10 @@ class SendThread implements Runnable
             // actual writing to socket
             PrintWriter out = new PrintWriter(new BufferedWriter(
                     new OutputStreamWriter(SockMngr.socket.getOutputStream())),
-                    true);
+                    true); // creates a place to write to in the network card
             String msg_len = String.format("%04d", SockMngr.text2send.toString().length());
             Log.d("MESSAGE: ", SockMngr.text2send);
-            out.print(msg_len + SockMngr.text2send);
+            out.print(msg_len + SockMngr.text2send); // write
             out.flush(); // flushing to force write
             // if the user hasn't asked to quit
             if (!SockMngr.text2send.contains("QUIT"))

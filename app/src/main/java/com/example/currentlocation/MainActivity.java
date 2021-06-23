@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
+                    cancelTimer();
                     Log.d("Location Update", "Button clicked");
                     // the button has been switched off - stop location service
                     stopLocationService();
@@ -136,7 +137,6 @@ public class MainActivity extends AppCompatActivity
                     Log.d("******", "Sending quit!!");
                     SockMngr.sendAndReceive(username + "," + "QUIT");
                     Log.d("******", "Sent quit!!");
-                    cancelTimer();
                 }
             }
         });
